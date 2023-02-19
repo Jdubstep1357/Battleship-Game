@@ -41,7 +41,7 @@ function createBoard(color, user) {
 }
 
 createBoard('yellow', 'player')
-createBoard('blue', 'computer')
+createBoard('aqua', 'computer')
 
 
 // Creating ships
@@ -75,24 +75,57 @@ function addShipPiece(ship) {
     specific number of div on board for placement */
     let randomStartIndex = Math.floor(Math.random() * width * width)
 
+    // makes sure ships arent out of bounds
+    // ? and : are boolean similar to php
+    let validStart = isHorizontal ? randomStartIndex <= width * width - ship.length ? 
+    randomStartIndex : width * width - ship.length :
+    // handle vertical
+    randomStartIndex <= width * width - width * ship.length ? randomStartIndex : 
+        randomStartIndex - ship.length * width + width
+
     let shipBlocks = []
 
     for(let i = 0; i < ship.length; i++) {
         if(isHorizontal) {
             // displays next part of 'ship' until it executes ship length
             // ie no ship with ten tiles
-            shipBlocks.push(allBoardBlocks[Number(randomStartIndex) + i])
+            shipBlocks.push(allBoardBlocks[Number(validStart) + i])
         } else {
             // CHECKS IF IT IS VERTICAL
-            shipBlocks.push(allBoardBlocks[Number(randomStartIndex) + i * width])
+            shipBlocks.push(allBoardBlocks[Number(validStart) + i * width])
         }
     }
 
-    // DISPLAYS EACH SHIP ONTO GRID
-    shipBlocks.forEach(shipBlock => {
-        shipBlock.classList.add(ship.name)
-        shipBlock.classList.add('taken')
-    })
+
+    // every() executes a function for each array element. 
+    // Returns true if function returns true for all elements
+    let valid
+    // stops blocks from overlapping
+    if (isHorizontal) {
+        // _shipBlock means loop for every shipBlock
+        valid = shipBlocks.every((_shipBlock, index) => 
+        shipBlocks[0].id % width !== width - (shipBlocks.length - (index + 1)))
+    } else {
+        valid = shipBlocks.every((_shipBlock, index) => 
+            shipBlocks[0].id < 90 + (width * index + 1)
+        )
+    }
+
+    // Account for if space is taken or not
+    const notTaken = shipBlocks.every(shipBlock => !shipBlock.classList.contains('taken'))
+
+        if(valid && notTaken) {
+        // DISPLAYS EACH SHIP ONTO GRID
+        shipBlocks.forEach(shipBlock => {
+            shipBlock.classList.add(ship.name)
+            shipBlock.classList.add('taken')
+        })
+    } else {
+        // continue to run until ship space not taken
+        addShipPiece(ship)
+    }
+
+
 }
 
-addShipPiece(destroyer)
+ships.forEach(ship => addShipPiece(ship))
