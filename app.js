@@ -12,6 +12,9 @@ function flip() {
     optionShips.forEach(optionShip => optionShip.style.transform = `rotate(${angle}deg)`)
 }
 
+// flip refers to function
+flipButton.addEventListener('click', flip)
+
 
 // Creating Boards
 const width = 10
@@ -40,9 +43,56 @@ function createBoard(color, user) {
 createBoard('yellow', 'player')
 createBoard('blue', 'computer')
 
-// flip refers to function
-flipButton.addEventListener('click', flip)
+
+// Creating ships
+class Ship {
+    /* Constructor a method of a class for creating 
+    and initializing an object of that class
+    */
+    constructor(name, length) {
+        this.name = name
+        this.length = length
+    }
+}
+
+const destroyer = new Ship ('destroyer', 2)
+const submarine = new Ship('submarine', 3)
+const cruiser = new Ship('cruiser', 3)
+const battleship = new Ship('battleship', 4)
+const carrier = new Ship('carrier', 5)
+
+const ships = [destroyer, submarine, cruiser, battleship, carrier]
 
 
+function addShipPiece(ship) {
+    // selects all divs with id of computer
+    const allBoardBlocks = document.querySelectorAll('#computer div')
+    // returns true or false
+    let randomBoolean = Math.random() < 0.5
+    
+    let isHorizontal = randomBoolean
+    /* gives a number from 1 to 99, ie to select 
+    specific number of div on board for placement */
+    let randomStartIndex = Math.floor(Math.random() * width * width)
 
+    let shipBlocks = []
 
+    for(let i = 0; i < ship.length; i++) {
+        if(isHorizontal) {
+            // displays next part of 'ship' until it executes ship length
+            // ie no ship with ten tiles
+            shipBlocks.push(allBoardBlocks[Number(randomStartIndex) + i])
+        } else {
+            // CHECKS IF IT IS VERTICAL
+            shipBlocks.push(allBoardBlocks[Number(randomStartIndex) + i * width])
+        }
+    }
+
+    // DISPLAYS EACH SHIP ONTO GRID
+    shipBlocks.forEach(shipBlock => {
+        shipBlock.classList.add(ship.name)
+        shipBlock.classList.add('taken')
+    })
+}
+
+addShipPiece(destroyer)
